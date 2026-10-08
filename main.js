@@ -25,16 +25,36 @@ const {
  * ======================================================= */
 
 const DEFAULT_SIGNIFIERS = {
-    a: { symbol: "→", label: "Action", color: "auto", enabled: true },
-    q: { symbol: "?", label: "Question", color: "auto", enabled: true },
-    d: { symbol: "◆", label: "Decision", color: "auto", enabled: true },
-    i: { symbol: "💡", label: "Idea", color: "auto", enabled: true },
-    "!": { symbol: "!", label: "Critical", color: "auto", enabled: true },
-    w: { symbol: "⚠", label: "Warning", color: "auto", enabled: true },
-    v: { symbol: "✓", label: "Verified", color: "auto", enabled: true },
-    u: { symbol: "≈", label: "Uncertain", color: "auto", enabled: true },
-    t: { symbol: "⌁", label: "Temporary", color: "auto", enabled: true },
-    r: { symbol: "↻", label: "Review", color: "auto", enabled: true }
+"s": {
+      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z\"></path></svg>",
+      "label": "Important",
+      "color": "auto",
+      "enabled": true
+    },
+    "!": {
+      "symbol": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2 0h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Zm6 3a1.5 1.5 0 0 0-1.5 1.75l.75 4.5a.75.75 0 0 0 1.5 0l.75-4.5A1.5 1.5 0 0 0 8 3Zm0 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z' fill='black'/%3e%3c/svg%3e",
+      "label": "Critical",
+      "color": "auto",
+      "enabled": true
+    },
+    "i": {
+      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7.94101 18C7.64391 16.7274 6.30412 15.6857 5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.6944 15.687 16.3558 16.7276 16.059 18H7.94101ZM16 20V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V20H16ZM13 10.0048V6L8.5 12.0048H11V16.0048L15.5 10.0048H13Z\"></path></svg>",
+      "label": "Inspiration",
+      "color": "auto",
+      "enabled": true
+    },
+    "?": {
+      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"36\" height=\"36\" fill=\"currentColor\"><path d=\"M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM13 13.3551C14.4457 12.9248 15.5 11.5855 15.5 10C15.5 8.067 13.933 6.5 12 6.5C10.302 6.5 8.88637 7.70919 8.56731 9.31346L10.5288 9.70577C10.6656 9.01823 11.2723 8.5 12 8.5C12.8284 8.5 13.5 9.17157 13.5 10C13.5 10.8284 12.8284 11.5 12 11.5C11.4477 11.5 11 11.9477 11 12.5V14H13V13.3551Z\"></path></svg>",
+      "label": "Question",
+      "color": "auto",
+      "enabled": true
+    },
+    "d": {
+      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0001 22.0001C7.02956 22.0001 3.00012 17.9707 3.00012 13.0001C3.00012 8.02956 7.02956 4.00012 12.0001 4.00012C16.9707 4.00012 21.0001 8.02956 21.0001 13.0001C21.0001 17.9707 16.9707 22.0001 12.0001 22.0001ZM13.0001 13.0001V8.00012H11.0001V15.0001H16.0001V13.0001H13.0001ZM1.74707 6.2826L5.2826 2.74707L6.69682 4.16128L3.16128 7.69682L1.74707 6.2826ZM18.7176 2.74707L22.2532 6.2826L20.839 7.69682L17.3034 4.16128L18.7176 2.74707Z\"></path></svg>",
+      "label": "Due",
+      "color": "auto",
+      "enabled": true
+    }
 };
 
 const MAX_SVG_LENGTH = 200000;
@@ -353,9 +373,41 @@ function createSafeSvg(source) {
 }
 
 
-function appendSvg(container, svg) {
-    svg.classList.add("signifier-svg");
-    container.replaceChildren(svg);
+function appendMask(container, dataUri) {
+  container.textContent = "";
+  container.classList.add("signifier-mask");
+
+  container.style.setProperty("-webkit-mask-image", `url("${dataUri}")`);
+  container.style.setProperty("mask-image", `url("${dataUri}")`);
+  container.style.setProperty("-webkit-mask-repeat", "no-repeat");
+  container.style.setProperty("mask-repeat", "no-repeat");
+  container.style.setProperty("-webkit-mask-position", "center");
+  container.style.setProperty("mask-position", "center");
+  container.style.setProperty("-webkit-mask-size", "contain");
+  container.style.setProperty("mask-size", "contain");
+  container.style.setProperty("background-color", "var(--signifier-color, currentColor)");
+
+  // Mask elementinin mutlaka boyutu olsun
+  if (!container.style.width) {
+    container.style.width = "1em";
+  }
+
+  if (!container.style.height) {
+    container.style.height = "1em";
+  }
+
+  if (!container.style.display) {
+    container.style.display = "inline-block";
+  }
+}
+
+function svgToDataUri(svg) {
+    const serialized = new XMLSerializer().serializeToString(svg);
+
+    return (
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(serialized)
+    );
 }
 
 
@@ -364,15 +416,35 @@ function renderSymbol(plugin, container, symbolValue) {
 
     container.classList.remove(
         "signifier-loading",
-        "signifier-error"
+        "signifier-error",
+        "signifier-mask"
     );
 
-    /* Inline SVG */
+    container.style.removeProperty("-webkit-mask-image");
+    container.style.removeProperty("mask-image");
+    container.style.removeProperty("-webkit-mask-repeat");
+    container.style.removeProperty("mask-repeat");
+    container.style.removeProperty("-webkit-mask-position");
+    container.style.removeProperty("mask-position");
+    container.style.removeProperty("-webkit-mask-size");
+    container.style.removeProperty("mask-size");
+    container.style.removeProperty("background-color");
+
+    /*
+     * Inline SVG
+     */
+
+    if (symbolValue.startsWith("data:image/svg+xml")) {
+    appendMask(container, symbolValue);
+    return;
+    }
+
+
     if (isSvgSymbol(symbol)) {
         const svg = createSafeSvg(symbol);
 
         if (svg) {
-            appendSvg(container, svg);
+            appendMask(container, svgToDataUri(svg));
         } else {
             container.classList.add("signifier-error");
             container.textContent = ERROR_SYMBOL;
@@ -381,7 +453,17 @@ function renderSymbol(plugin, container, symbolValue) {
         return;
     }
 
-    /* CDN / remote SVG */
+    /*
+     * SVG data URI
+     */
+    if (/^data:image\/svg\+xml[,;]/i.test(symbol)) {
+        appendMask(container, symbol);
+        return;
+    }
+
+    /*
+     * Remote / CDN SVG
+     */
     if (isUrlSymbol(symbol)) {
         const url = resolveSymbolUrl(symbol);
 
@@ -398,7 +480,7 @@ function renderSymbol(plugin, container, symbolValue) {
         const cached = plugin.getCachedSvg(url);
 
         if (cached) {
-            appendSvg(container, cached);
+            appendMask(container, svgToDataUri(cached));
             return;
         }
 
@@ -412,17 +494,15 @@ function renderSymbol(plugin, container, symbolValue) {
         container.textContent = LOADING_SYMBOL;
 
         plugin.loadSvg(url).then(() => {
-            /*
-             * After loading, the SVG is either cached or marked as
-             * failed, so this second call can never load again.
-             */
             renderSymbol(plugin, container, symbol);
         });
 
         return;
     }
 
-    /* Plain text / emoji */
+    /*
+     * Plain text / emoji
+     */
     container.textContent = symbol;
 }
 
@@ -954,10 +1034,10 @@ class SignifierSettingTab extends PluginSettingTab {
 
         help.setText(
             "Symbol can be plain text / emoji, an inline <svg>…</svg>, " +
-            "an https:// SVG URL, or a CDN shorthand: " +
-            "npm:lucide-static@latest/icons/check.svg  or  " +
+            "an SVG data URI, an https:// SVG URL, or a CDN shorthand: " +
+            "npm:lucide-static@latest/icons/check.svg or " +
             "gh:user/repo@main/icon.svg (both resolved via jsDelivr). " +
-            "Remote SVGs are sanitized and cached for offline use."
+            "SVG sources are rendered as CSS masks, sanitized, and cached for offline use."
         );
 
         Object.entries(this.plugin.settings.signifiers).forEach(
