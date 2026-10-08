@@ -1,7 +1,7 @@
 {
   "id": "signifier-toolkit",
   "name": "Signifier Toolkit",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "minAppVersion": "1.5.0",
   "description": "Configurable semantic signifiers for Markdown.",
   "author": "Can Torun",

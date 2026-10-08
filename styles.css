@@ -48,3 +48,86 @@
     color: var(--text-error);
     opacity: 0.8;
 }
+
+/* Color mode controls in settings */
+.signifier-color-control,
+.signifier-color-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.signifier-input-invalid {
+    border-color: var(--text-error) !important;
+}
+
+/* One card per signifier */
+.signifier-block {
+    margin: 18px 0;
+    padding: 6px 16px 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-left: 4px solid var(--interactive-accent);
+    border-radius: var(--radius-m);
+    background-color: var(--background-secondary);
+}
+
+.signifier-block .setting-item {
+    border-top: none;
+}
+
+.signifier-header {
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--background-modifier-border) !important;
+}
+
+.signifier-header .setting-item-name {
+    font-size: var(--font-ui-medium);
+    font-weight: 600;
+}
+
+.signifier-subrow {
+    padding-left: 0;
+}
+
+.signifier-subrow .setting-item-description {
+    font-size: var(--font-ui-smaller);
+}
+
+/* Neutralize theme "card" styling for rows inside a signifier card */
+.signifier-block .setting-item {
+    background: transparent !important;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+    padding: 10px 0;
+    min-height: 0;
+}
+
+.signifier-block .setting-item + .setting-item {
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.signifier-block .signifier-header + .setting-item {
+    border-top: none;
+}
+
+.signifier-block .setting-item-info,
+.signifier-block .setting-item-control {
+    margin: 0;
+}
+
+.signifier-block .setting-item-name {
+    margin: 0;
+    padding: 0;
+}
+
+.signifier-block .setting-item-description {
+    margin: 2px 0 0;
+    padding: 0;
+}
+
+.signifier-block .setting-item-description:empty {
+    display: none;
+}

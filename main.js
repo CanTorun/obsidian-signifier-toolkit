@@ -6,7 +6,10 @@ const {
     Modal,
     requestUrl,
     debounce,
-    editorLivePreviewField
+    editorLivePreviewField,
+    DropdownComponent,
+    TextComponent,
+    ColorComponent
 } = require("obsidian");
 
 const {
@@ -25,37 +28,58 @@ const {
  * ======================================================= */
 
 const DEFAULT_SIGNIFIERS = {
-"s": {
-      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z\"></path></svg>",
-      "label": "Important",
-      "color": "auto",
-      "enabled": true
+    "s": {
+        "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z\"></path></svg>",
+        "label": "Important",
+        "color": "auto",
+        "enabled": true
     },
     "!": {
-      "symbol": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2 0h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Zm6 3a1.5 1.5 0 0 0-1.5 1.75l.75 4.5a.75.75 0 0 0 1.5 0l.75-4.5A1.5 1.5 0 0 0 8 3Zm0 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z' fill='black'/%3e%3c/svg%3e",
-      "label": "Critical",
-      "color": "auto",
-      "enabled": true
+        "symbol": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2 0h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Zm6 3a1.5 1.5 0 0 0-1.5 1.75l.75 4.5a.75.75 0 0 0 1.5 0l.75-4.5A1.5 1.5 0 0 0 8 3Zm0 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z' fill='black'/%3e%3c/svg%3e",
+        "label": "Critical",
+        "color": "auto",
+        "enabled": true
     },
     "i": {
-      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7.94101 18C7.64391 16.7274 6.30412 15.6857 5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.6944 15.687 16.3558 16.7276 16.059 18H7.94101ZM16 20V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V20H16ZM13 10.0048V6L8.5 12.0048H11V16.0048L15.5 10.0048H13Z\"></path></svg>",
-      "label": "Inspiration",
-      "color": "auto",
-      "enabled": true
+        "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7.94101 18C7.64391 16.7274 6.30412 15.6857 5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.6944 15.687 16.3558 16.7276 16.059 18H7.94101ZM16 20V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V20H16ZM13 10.0048V6L8.5 12.0048H11V16.0048L15.5 10.0048H13Z\"></path></svg>",
+        "label": "Inspiration",
+        "color": "auto",
+        "enabled": true
     },
     "?": {
-      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"36\" height=\"36\" fill=\"currentColor\"><path d=\"M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM13 13.3551C14.4457 12.9248 15.5 11.5855 15.5 10C15.5 8.067 13.933 6.5 12 6.5C10.302 6.5 8.88637 7.70919 8.56731 9.31346L10.5288 9.70577C10.6656 9.01823 11.2723 8.5 12 8.5C12.8284 8.5 13.5 9.17157 13.5 10C13.5 10.8284 12.8284 11.5 12 11.5C11.4477 11.5 11 11.9477 11 12.5V14H13V13.3551Z\"></path></svg>",
-      "label": "Question",
-      "color": "auto",
-      "enabled": true
+        "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"36\" height=\"36\" fill=\"currentColor\"><path d=\"M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM13 13.3551C14.4457 12.9248 15.5 11.5855 15.5 10C15.5 8.067 13.933 6.5 12 6.5C10.302 6.5 8.88637 7.70919 8.56731 9.31346L10.5288 9.70577C10.6656 9.01823 11.2723 8.5 12 8.5C12.8284 8.5 13.5 9.17157 13.5 10C13.5 10.8284 12.8284 11.5 12 11.5C11.4477 11.5 11 11.9477 11 12.5V14H13V13.3551Z\"></path></svg>",
+        "label": "Question",
+        "color": "auto",
+        "enabled": true
     },
     "d": {
-      "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0001 22.0001C7.02956 22.0001 3.00012 17.9707 3.00012 13.0001C3.00012 8.02956 7.02956 4.00012 12.0001 4.00012C16.9707 4.00012 21.0001 8.02956 21.0001 13.0001C21.0001 17.9707 16.9707 22.0001 12.0001 22.0001ZM13.0001 13.0001V8.00012H11.0001V15.0001H16.0001V13.0001H13.0001ZM1.74707 6.2826L5.2826 2.74707L6.69682 4.16128L3.16128 7.69682L1.74707 6.2826ZM18.7176 2.74707L22.2532 6.2826L20.839 7.69682L17.3034 4.16128L18.7176 2.74707Z\"></path></svg>",
-      "label": "Due",
-      "color": "auto",
-      "enabled": true
+        "symbol": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0001 22.0001C7.02956 22.0001 3.00012 17.9707 3.00012 13.0001C3.00012 8.02956 7.02956 4.00012 12.0001 4.00012C16.9707 4.00012 21.0001 8.02956 21.0001 13.0001C21.0001 17.9707 16.9707 22.0001 12.0001 22.0001ZM13.0001 13.0001V8.00012H11.0001V15.0001H16.0001V13.0001H13.0001ZM1.74707 6.2826L5.2826 2.74707L6.69682 4.16128L3.16128 7.69682L1.74707 6.2826ZM18.7176 2.74707L22.2532 6.2826L20.839 7.69682L17.3034 4.16128L18.7176 2.74707Z\"></path></svg>",
+        "label": "Due",
+        "color": "auto",
+        "enabled": true
     }
 };
+
+const COLOR_MODES = ["auto", "theme", "free", "fixed"];
+
+const THEME_COLOR_VARS = [
+    "--text-normal",
+    "--text-muted",
+    "--text-faint",
+    "--text-accent",
+    "--text-error",
+    "--text-warning",
+    "--text-success",
+    "--interactive-accent",
+    "--color-red",
+    "--color-orange",
+    "--color-yellow",
+    "--color-green",
+    "--color-cyan",
+    "--color-blue",
+    "--color-purple",
+    "--color-pink"
+];
 
 const MAX_SVG_LENGTH = 200000;
 const ERROR_SYMBOL = "⬚";
@@ -73,7 +97,13 @@ function hasOwn(object, key) {
 
 
 function cloneDefaults() {
-    return JSON.parse(JSON.stringify(DEFAULT_SIGNIFIERS));
+    const clone = JSON.parse(JSON.stringify(DEFAULT_SIGNIFIERS));
+
+    for (const key of Object.keys(clone)) {
+        clone[key] = normalizeEntry(clone[key]);
+    }
+
+    return clone;
 }
 
 
@@ -93,7 +123,7 @@ function normalizeColor(color) {
 
     const value = color.trim();
 
-    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value)) {
+    if (isHexColor(value) || isVarColor(value)) {
         return value;
     }
 
@@ -101,13 +131,106 @@ function normalizeColor(color) {
 }
 
 
+function isHexColor(value) {
+    return (
+        typeof value === "string" &&
+        /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value)
+    );
+}
+
+
+/* Only "var(--name)" is accepted, never free CSS. */
+function isVarColor(value) {
+    return (
+        typeof value === "string" &&
+        /^var\(--[A-Za-z0-9_-]+\)$/.test(value)
+    );
+}
+
+
+function getVarName(color) {
+    return isVarColor(color) ? color.slice(4, -1) : "";
+}
+
+
+/* Accepts "--x", "x" or "var(--x)". Returns "var(--x)" or null. */
+function parseVarInput(input) {
+    let name = String(input)
+        .trim()
+        .replace(/^var\(\s*/i, "")
+        .replace(/\s*\)$/, "");
+
+    if (!name.startsWith("--")) {
+        name = "--" + name;
+    }
+
+    return /^--[A-Za-z0-9_-]+$/.test(name) ? `var(${name})` : null;
+}
+
+
+/* <input type="color"> only understands #rrggbb. */
+function toPickerHex(color) {
+    if (!isHexColor(color)) {
+        return "#808080";
+    }
+
+    if (color.length === 4) {
+        return (
+            "#" +
+            color[1] + color[1] +
+            color[2] + color[2] +
+            color[3] + color[3]
+        );
+    }
+
+    return color.slice(0, 7);
+}
+
+
+/* Value to use after switching to a mode (keeps it if it fits). */
+function defaultColorForMode(mode, current) {
+    switch (mode) {
+        case "theme":
+            return THEME_COLOR_VARS.includes(getVarName(current))
+                ? current
+                : "var(--text-accent)";
+
+        case "free":
+            return isVarColor(current) ? current : "auto";
+
+        case "fixed":
+            return isHexColor(current) ? current : "#808080";
+
+        default:
+            return "auto";
+    }
+}
+
+
 function normalizeEntry(value) {
     const source = isPlainObject(value) ? value : {};
+    const color = normalizeColor(source.color);
+
+    let mode = source.colorMode;
+
+    /* Old settings had no colorMode: derive it from the color. */
+    if (!COLOR_MODES.includes(mode)) {
+        if (isHexColor(color)) {
+            mode = "fixed";
+        } else if (isVarColor(color)) {
+            mode = THEME_COLOR_VARS.includes(getVarName(color))
+                ? "theme"
+                : "free";
+        } else {
+            mode = "auto";
+        }
+    }
 
     return {
         symbol: typeof source.symbol === "string" ? source.symbol : "•",
         label: typeof source.label === "string" ? source.label : "No label",
-        color: normalizeColor(source.color),
+        colorMode: mode,
+        color: defaultColorForMode(mode, color),
         enabled: source.enabled !== false
     };
 }
@@ -120,6 +243,32 @@ function isValidKey(key) {
         key !== "__proto__" &&
         !/[()\s]/.test(key)
     );
+}
+
+
+/* Returns an error message, or null when the key is usable. */
+function getKeyError(signifiers, key, currentKey = null) {
+    if (!key) {
+        return "Key cannot be empty.";
+    }
+
+    if (key.includes("(") || key.includes(")")) {
+        return "Key cannot contain parentheses.";
+    }
+
+    if (/\s/.test(key)) {
+        return "Key cannot contain spaces.";
+    }
+
+    if (!isValidKey(key)) {
+        return "This key is not allowed.";
+    }
+
+    if (key !== currentKey && hasOwn(signifiers, key)) {
+        return `Signifier (${key}) already exists.`;
+    }
+
+    return null;
 }
 
 
@@ -185,7 +334,13 @@ function applySignifierColor(element, color) {
     }
 
     element.dataset.signifierColor = value;
-    element.style.setProperty("--signifier-color", value);
+
+    /* Theme variables fall back to the accent color if undefined. */
+    const css = isVarColor(value)
+        ? value.replace(/\)$/, ", var(--text-accent))")
+        : value;
+
+    element.style.setProperty("--signifier-color", css);
 }
 
 
@@ -374,32 +529,43 @@ function createSafeSvg(source) {
 
 
 function appendMask(container, dataUri) {
-  container.textContent = "";
-  container.classList.add("signifier-mask");
+    /* Quotes / line breaks would break out of url("..."). */
+    const safeUri = String(dataUri)
+        .replace(/[\r\n]+/g, "")
+        .replace(/"/g, "%22");
 
-  container.style.setProperty("-webkit-mask-image", `url("${dataUri}")`);
-  container.style.setProperty("mask-image", `url("${dataUri}")`);
-  container.style.setProperty("-webkit-mask-repeat", "no-repeat");
-  container.style.setProperty("mask-repeat", "no-repeat");
-  container.style.setProperty("-webkit-mask-position", "center");
-  container.style.setProperty("mask-position", "center");
-  container.style.setProperty("-webkit-mask-size", "contain");
-  container.style.setProperty("mask-size", "contain");
-  container.style.setProperty("background-color", "var(--signifier-color, currentColor)");
+    container.textContent = "";
+    container.classList.add("signifier-mask");
 
-  // Mask elementinin mutlaka boyutu olsun
-  if (!container.style.width) {
-    container.style.width = "1em";
-  }
+    const style = container.style;
 
-  if (!container.style.height) {
-    container.style.height = "1em";
-  }
+    style.setProperty("-webkit-mask-image", `url("${safeUri}")`);
+    style.setProperty("mask-image", `url("${safeUri}")`);
+    style.setProperty("-webkit-mask-repeat", "no-repeat");
+    style.setProperty("mask-repeat", "no-repeat");
+    style.setProperty("-webkit-mask-position", "center");
+    style.setProperty("mask-position", "center");
+    style.setProperty("-webkit-mask-size", "contain");
+    style.setProperty("mask-size", "contain");
+    style.setProperty(
+        "background-color",
+        "var(--signifier-color, currentColor)"
+    );
 
-  if (!container.style.display) {
-    container.style.display = "inline-block";
-  }
+    /* A mask element must have a size. */
+    if (!style.width) {
+        style.width = "1em";
+    }
+
+    if (!style.height) {
+        style.height = "1em";
+    }
+
+    if (!style.display) {
+        style.display = "inline-block";
+    }
 }
+
 
 function svgToDataUri(svg) {
     const serialized = new XMLSerializer().serializeToString(svg);
@@ -411,35 +577,42 @@ function svgToDataUri(svg) {
 }
 
 
-function renderSymbol(plugin, container, symbolValue) {
-    const symbol = String(symbolValue ?? "").trim();
-
+function resetMask(container) {
     container.classList.remove(
         "signifier-loading",
         "signifier-error",
         "signifier-mask"
     );
 
-    container.style.removeProperty("-webkit-mask-image");
-    container.style.removeProperty("mask-image");
-    container.style.removeProperty("-webkit-mask-repeat");
-    container.style.removeProperty("mask-repeat");
-    container.style.removeProperty("-webkit-mask-position");
-    container.style.removeProperty("mask-position");
-    container.style.removeProperty("-webkit-mask-size");
-    container.style.removeProperty("mask-size");
-    container.style.removeProperty("background-color");
+    [
+        "-webkit-mask-image",
+        "mask-image",
+        "-webkit-mask-repeat",
+        "mask-repeat",
+        "-webkit-mask-position",
+        "mask-position",
+        "-webkit-mask-size",
+        "mask-size",
+        "background-color",
+        "width",
+        "height",
+        "display"
+    ].forEach(property => container.style.removeProperty(property));
+}
 
-    /*
-     * Inline SVG
-     */
 
-    if (symbolValue.startsWith("data:image/svg+xml")) {
-    appendMask(container, symbolValue);
-    return;
+function renderSymbol(plugin, container, symbolValue) {
+    const symbol = String(symbolValue ?? "").trim();
+
+    resetMask(container);
+
+    /* SVG data URI */
+    if (/^data:image\/svg\+xml[,;]/i.test(symbol)) {
+        appendMask(container, symbol);
+        return;
     }
 
-
+    /* Inline SVG */
     if (isSvgSymbol(symbol)) {
         const svg = createSafeSvg(symbol);
 
@@ -453,17 +626,7 @@ function renderSymbol(plugin, container, symbolValue) {
         return;
     }
 
-    /*
-     * SVG data URI
-     */
-    if (/^data:image\/svg\+xml[,;]/i.test(symbol)) {
-        appendMask(container, symbol);
-        return;
-    }
-
-    /*
-     * Remote / CDN SVG
-     */
+    /* Remote / CDN SVG */
     if (isUrlSymbol(symbol)) {
         const url = resolveSymbolUrl(symbol);
 
@@ -494,15 +657,14 @@ function renderSymbol(plugin, container, symbolValue) {
         container.textContent = LOADING_SYMBOL;
 
         plugin.loadSvg(url).then(() => {
+            /* Now cached or failed, so this cannot load again. */
             renderSymbol(plugin, container, symbol);
         });
 
         return;
     }
 
-    /*
-     * Plain text / emoji
-     */
+    /* Plain text / emoji */
     container.textContent = symbol;
 }
 
@@ -915,29 +1077,10 @@ class AddSignifierModal extends Modal {
 
     submit() {
         const key = this.key.trim();
+        const error = getKeyError(this.plugin.settings.signifiers, key);
 
-        if (!key) {
-            new Notice("Key cannot be empty.");
-            return;
-        }
-
-        if (key.includes("(") || key.includes(")")) {
-            new Notice("Key cannot contain parentheses.");
-            return;
-        }
-
-        if (/\s/.test(key)) {
-            new Notice("Key cannot contain spaces.");
-            return;
-        }
-
-        if (!isValidKey(key)) {
-            new Notice("This key is not allowed.");
-            return;
-        }
-
-        if (hasOwn(this.plugin.settings.signifiers, key)) {
-            new Notice(`Signifier (${key}) already exists.`);
+        if (error) {
+            new Notice(error);
             return;
         }
 
@@ -1058,6 +1201,7 @@ class SignifierSettingTab extends PluginSettingTab {
                                     symbol: "•",
                                     label: "New signifier",
                                     color: "auto",
+                                    colorMode: "auto",
                                     enabled: true
                                 };
 
@@ -1086,70 +1230,37 @@ class SignifierSettingTab extends PluginSettingTab {
 
 
     renderSignifier(containerEl, key, value) {
-        const setting = new Setting(containerEl)
+        const block = containerEl.createDiv({ cls: "signifier-block" });
+
+        const subRow = name => {
+            const row = new Setting(block).setName(name);
+
+            row.settingEl.classList.add("signifier-subrow");
+
+            return row;
+        };
+
+        /* Set later by the Shortcut row. */
+        let shortcutInput = null;
+
+        /* ---------- Header: (key), edit, enable toggle, delete ---------- */
+        const header = new Setting(block)
             .setName(`(${key})`)
             .setDesc(value.label || "No label");
 
-        /* Symbol / SVG / URL */
-        setting.addText(text => {
-            text
-                .setPlaceholder("Symbol, SVG or URL")
-                .setValue(value.symbol)
-                .onChange(newValue => {
-                    value.symbol = newValue;
-                    this.plugin.requestSave();
-                });
+        header.settingEl.classList.add("signifier-header");
 
-            text.inputEl.style.width = "160px";
-        });
-
-        /* Label */
-        setting.addText(text => {
-            text
-                .setPlaceholder("Label")
-                .setValue(value.label)
-                .onChange(newValue => {
-                    value.label = newValue;
-                    setting.setDesc(newValue || "No label");
-                    this.plugin.requestSave();
-                });
-        });
-
-        /* Color */
-        setting.addColorPicker(picker => {
-            const current = normalizeColor(value.color);
-
-            picker.setValue(current === "auto" ? "#808080" : current);
-            /* ColorComponent has no setTooltip(). */
-            if (picker.colorPickerEl) {
-                picker.colorPickerEl.setAttribute(
-                    "title",
-                    "Signifier color"
-                );
-            }
-
-            picker.onChange(newValue => {
-                value.color = newValue;
-                this.plugin.requestSave();
-            });
-        });
-
-        /* Reset color to theme */
-        setting.addExtraButton(button => {
+        header.addExtraButton(button => {
             button
-                .setIcon("rotate-ccw")
-                .setTooltip("Use theme color")
-                .onClick(async () => {
-                    value.color = "auto";
-
-                    await this.plugin.saveSettings();
-
-                    this.display();
+                .setIcon("pencil")
+                .setTooltip("Edit shortcut")
+                .onClick(() => {
+                    shortcutInput?.focus();
+                    shortcutInput?.select();
                 });
         });
 
-        /* Enabled */
-        setting.addToggle(toggle => {
+        header.addToggle(toggle => {
             toggle
                 .setValue(value.enabled)
                 .setTooltip("Enable signifier")
@@ -1160,8 +1271,7 @@ class SignifierSettingTab extends PluginSettingTab {
                 });
         });
 
-        /* Delete */
-        setting.addExtraButton(button => {
+        header.addExtraButton(button => {
             button
                 .setIcon("trash")
                 .setTooltip("Delete signifier")
@@ -1173,6 +1283,251 @@ class SignifierSettingTab extends PluginSettingTab {
                     this.display();
                 });
         });
+
+        /* ---------- Shortcut (editable key) ---------- */
+        let renaming = false;
+
+        const commitShortcut = async () => {
+            if (renaming || !shortcutInput) {
+                return;
+            }
+
+            const candidate = shortcutInput.value.trim();
+
+            if (candidate === key) {
+                shortcutInput.value = key;
+                shortcutInput.classList.remove("signifier-input-invalid");
+                return;
+            }
+
+            const error = getKeyError(
+                this.plugin.settings.signifiers,
+                candidate,
+                key
+            );
+
+            if (error) {
+                shortcutInput.classList.add("signifier-input-invalid");
+                new Notice(error);
+                return;
+            }
+
+            renaming = true;
+
+            await this.renameKey(key, candidate);
+        };
+
+        const shortcutRow = subRow("Shortcut").setDesc(
+            "The text typed between the parentheses, e.g. s for (s). " +
+            "Apply with Enter or the check button."
+        );
+
+        shortcutRow.addText(text => {
+            const input = text.inputEl;
+
+            shortcutInput = input;
+
+            text.setPlaceholder("key").setValue(key);
+
+            input.style.width = "90px";
+
+            input.addEventListener("input", () => {
+                const candidate = input.value.trim();
+
+                const error =
+                    candidate === key
+                        ? null
+                        : getKeyError(
+                            this.plugin.settings.signifiers,
+                            candidate,
+                            key
+                        );
+
+                input.classList.toggle(
+                    "signifier-input-invalid",
+                    Boolean(error)
+                );
+            });
+
+            input.addEventListener("keydown", event => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    commitShortcut();
+                }
+            });
+
+            /* Fires when the field loses focus after an edit. */
+            input.addEventListener("change", () => commitShortcut());
+        });
+
+        shortcutRow.addExtraButton(button => {
+            button
+                .setIcon("check")
+                .setTooltip("Apply shortcut")
+                .onClick(() => commitShortcut());
+        });
+
+        /* ---------- Symbol ---------- */
+        subRow("Symbol")
+            .setDesc("Text, emoji, <svg>, SVG data URI or SVG URL.")
+            .addTextArea(area => {
+                area
+                    .setPlaceholder("Symbol, SVG or URL")
+                    .setValue(value.symbol)
+                    .onChange(newValue => {
+                        value.symbol = newValue;
+                        this.plugin.requestSave();
+                    });
+
+                area.inputEl.rows = 2;
+                area.inputEl.style.width = "280px";
+            });
+
+        /* ---------- Label ---------- */
+        subRow("Label").addText(text => {
+            text
+                .setPlaceholder("Label")
+                .setValue(value.label)
+                .onChange(newValue => {
+                    value.label = newValue;
+                    header.setDesc(newValue || "No label");
+                    this.plugin.requestSave();
+                });
+        });
+
+        /* ---------- Color: mode dropdown + mode specific control ---------- */
+        const colorRow = subRow("Color").setDesc(
+            "Auto follows the theme."
+        );
+
+        const colorHolder = colorRow.controlEl.createSpan({
+            cls: "signifier-color-control"
+        });
+
+        const modeDropdown = new DropdownComponent(colorHolder);
+
+        const valueHolder = colorHolder.createSpan({
+            cls: "signifier-color-value"
+        });
+
+        const renderColorValue = () => {
+            valueHolder.replaceChildren();
+
+            if (value.colorMode === "theme") {
+                const dropdown = new DropdownComponent(valueHolder);
+
+                THEME_COLOR_VARS.forEach(name =>
+                    dropdown.addOption(name, name)
+                );
+
+                dropdown
+                    .setValue(getVarName(value.color))
+                    .onChange(name => {
+                        value.color = `var(${name})`;
+                        this.plugin.requestSave();
+                    });
+
+                return;
+            }
+
+            if (value.colorMode === "free") {
+                const text = new TextComponent(valueHolder);
+
+                text
+                    .setPlaceholder("--my-variable")
+                    .setValue(getVarName(value.color))
+                    .onChange(input => {
+                        if (!input.trim()) {
+                            text.inputEl.classList.remove(
+                                "signifier-input-invalid"
+                            );
+
+                            value.color = "auto";
+                            this.plugin.requestSave();
+
+                            return;
+                        }
+
+                        const parsed = parseVarInput(input);
+
+                        text.inputEl.classList.toggle(
+                            "signifier-input-invalid",
+                            !parsed
+                        );
+
+                        if (!parsed) {
+                            return;
+                        }
+
+                        value.color = parsed;
+                        this.plugin.requestSave();
+                    });
+
+                text.inputEl.setAttribute(
+                    "title",
+                    "CSS variable, e.g. --color-pink"
+                );
+
+                text.inputEl.style.width = "140px";
+
+                return;
+            }
+
+            if (value.colorMode === "fixed") {
+                const picker = new ColorComponent(valueHolder);
+
+                picker.setValue(toPickerHex(value.color));
+
+                /* ColorComponent has no setTooltip(). */
+                if (picker.colorPickerEl) {
+                    picker.colorPickerEl.setAttribute(
+                        "title",
+                        "Signifier color"
+                    );
+                }
+
+                picker.onChange(newValue => {
+                    value.color = newValue;
+                    this.plugin.requestSave();
+                });
+            }
+        };
+
+        modeDropdown
+            .addOptions({
+                auto: "Auto",
+                theme: "Theme",
+                free: "Free",
+                fixed: "Fixed"
+            })
+            .setValue(value.colorMode)
+            .onChange(async mode => {
+                value.colorMode = mode;
+                value.color = defaultColorForMode(mode, value.color);
+
+                renderColorValue();
+
+                await this.plugin.saveSettings();
+            });
+
+        renderColorValue();
+    }
+
+
+    /* Renames a key while keeping the list order. */
+    async renameKey(oldKey, newKey) {
+        const signifiers = this.plugin.settings.signifiers;
+
+        this.plugin.settings.signifiers = Object.fromEntries(
+            Object.entries(signifiers).map(([key, value]) => [
+                key === oldKey ? newKey : key,
+                value
+            ])
+        );
+
+        await this.plugin.saveSettings();
+
+        this.display();
     }
 
 
