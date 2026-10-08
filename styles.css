@@ -1,0 +1,86 @@
+/* =========================================================
+ * Signifier
+ * ======================================================= */
+
+:root {
+    --signifier-action: var(--interactive-accent);
+    --signifier-question: var(--color-yellow);
+    --signifier-decision: var(--color-purple);
+    --signifier-idea: var(--color-orange);
+    --signifier-critical: var(--color-red);
+    --signifier-warning: var(--color-yellow);
+    --signifier-verified: var(--color-green);
+    --signifier-uncertain: var(--text-muted);
+    --signifier-temporary: var(--text-faint);
+    --signifier-review: var(--color-blue);
+}
+
+
+/* =========================================================
+ * Base
+ * ======================================================= */
+
+.signifier,
+.cm-signifier {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.35em;
+    min-width: 1.35em;
+
+    margin-right: 0.18em;
+
+    font-family: var(--font-interface);
+    font-weight: 700;
+    line-height: 1;
+
+    vertical-align: -0.05em;
+
+    cursor: help;
+}
+
+
+/* =========================================================
+ * Colors
+ * ======================================================= */
+
+.signifier--a {
+    color: var(--signifier-action);
+}
+
+.signifier--q {
+    color: var(--signifier-question);
+}
+
+.signifier--d {
+    color: var(--signifier-decision);
+}
+
+.signifier--i {
+    color: var(--signifier-idea);
+}
+
+.signifier--\! {
+    color: var(--signifier-critical);
+}
+
+.signifier--w {
+    color: var(--signifier-warning);
+}
+
+.signifier--v {
+    color: var(--signifier-verified);
+}
+
+.signifier--u {
+    color: var(--signifier-uncertain);
+}
+
+.signifier--t {
+    color: var(--signifier-temporary);
+}
+
+.signifier--r {
+    color: var(--signifier-review);
+}
