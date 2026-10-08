@@ -3,7 +3,7 @@
   "name": "Signifier Toolkit",
   "version": "0.8.0",
   "minAppVersion": "1.5.0",
-  "description": "Configurable semantic signifiers for Markdown.",
+  "description": "Turn markers like (!) and (?) at the start of a line into configurable, theme-aware icons.",
   "author": "KhalaAzar",
   "isDesktopOnly": false
 }
