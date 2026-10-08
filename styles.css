@@ -1,86 +1,50 @@
-/* =========================================================
- * Signifier
- * ======================================================= */
-
-:root {
-    --signifier-action: var(--interactive-accent);
-    --signifier-question: var(--color-yellow);
-    --signifier-decision: var(--color-purple);
-    --signifier-idea: var(--color-orange);
-    --signifier-critical: var(--color-red);
-    --signifier-warning: var(--color-yellow);
-    --signifier-verified: var(--color-green);
-    --signifier-uncertain: var(--text-muted);
-    --signifier-temporary: var(--text-faint);
-    --signifier-review: var(--color-blue);
-}
-
-
-/* =========================================================
- * Base
- * ======================================================= */
-
 .signifier,
 .cm-signifier {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    width: 1.35em;
-    min-width: 1.35em;
-
-    margin-right: 0.18em;
-
-    font-family: var(--font-interface);
-    font-weight: 700;
+    min-width: 1.2em;
+    margin-right: 0.35em;
+    font-weight: 600;
     line-height: 1;
-
-    vertical-align: -0.05em;
-
-    cursor: help;
+    vertical-align: baseline;
+    color: var(--signifier-color, var(--text-accent));
 }
 
-
-/* =========================================================
- * Colors
- * ======================================================= */
-
-.signifier--a {
-    color: var(--signifier-action);
+/* Theme-aware defaults (only when no custom color is set) */
+.signifier:not([data-signifier-color])[data-signifier="!"],
+.cm-signifier:not([data-signifier-color])[data-signifier="!"] {
+    color: var(--text-error);
 }
 
-.signifier--q {
-    color: var(--signifier-question);
+.signifier:not([data-signifier-color])[data-signifier="w"],
+.cm-signifier:not([data-signifier-color])[data-signifier="w"] {
+    color: var(--color-orange);
 }
 
-.signifier--d {
-    color: var(--signifier-decision);
+.signifier:not([data-signifier-color])[data-signifier="v"],
+.cm-signifier:not([data-signifier-color])[data-signifier="v"] {
+    color: var(--color-green);
 }
 
-.signifier--i {
-    color: var(--signifier-idea);
+.signifier:not([data-signifier-color])[data-signifier="q"],
+.cm-signifier:not([data-signifier-color])[data-signifier="q"] {
+    color: var(--color-purple);
 }
 
-.signifier--\! {
-    color: var(--signifier-critical);
+/* SVG icons (inline or CDN) */
+.signifier-svg {
+    width: 1em;
+    height: 1em;
+    flex: none;
+    color: inherit;
 }
 
-.signifier--w {
-    color: var(--signifier-warning);
+.signifier-loading {
+    opacity: 0.4;
 }
 
-.signifier--v {
-    color: var(--signifier-verified);
-}
-
-.signifier--u {
-    color: var(--signifier-uncertain);
-}
-
-.signifier--t {
-    color: var(--signifier-temporary);
-}
-
-.signifier--r {
-    color: var(--signifier-review);
+.signifier-error {
+    color: var(--text-error);
+    opacity: 0.8;
 }

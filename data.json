@@ -1,0 +1,41 @@
+{
+  "signifiers": {
+    "a": {
+      "symbol": "",
+      "label": "Action",
+      "color": "#851414",
+      "enabled": true
+    },
+    "q": {
+      "symbol": "?",
+      "label": "Question",
+      "color": "auto",
+      "enabled": true
+    },
+    "d": {
+      "symbol": "◆",
+      "label": "Decision",
+      "color": "auto",
+      "enabled": true
+    },
+    "i": {
+      "symbol": "💡",
+      "label": "Idea",
+      "color": "auto",
+      "enabled": true
+    },
+    "!": {
+      "symbol": "!",
+      "label": "Critical",
+      "color": "auto",
+      "enabled": true
+    },
+    "b": {
+      "symbol": "•",
+      "label": "New signifier",
+      "color": "auto",
+      "enabled": true
+    }
+  },
+  "svgCache": {}
+}
